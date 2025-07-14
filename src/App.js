@@ -1,23 +1,51 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import AddTask from './components/AddTask';
+import ListTask from './components/ListTask';
+import FilterTask from './components/FilterTask';
 import './App.css';
 
 function App() {
+  const [tasks, setTasks] = useState([]);
+  const [filter, setFilter] = useState('All');
+
+  const addTask = (title) => {
+    if (title.trim() === '') return;
+    const newTask = {
+      id: Date.now(),
+      title,
+      completed: false,
+    };
+    setTasks([...tasks, newTask]);
+  };
+
+  const toggleTask = (id) => {
+    setTasks(
+      tasks.map(task =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+
+  const filteredTasks = tasks.filter(task => {
+    if (filter === 'Active') return !task.completed;
+    if (filter === 'Completed') return task.completed;
+    return true;
+  });
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Task Management Dashboard</h1>
+      <AddTask onAdd={addTask} />
+      <FilterTask filter={filter} setFilter={setFilter} />
+      <ListTask
+        tasks={filteredTasks}
+        onToggle={toggleTask}
+        onDelete={deleteTask}
+      />
     </div>
   );
 }
