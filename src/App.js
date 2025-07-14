@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AddTask from './components/AddTask';
 import ListTask from './components/ListTask';
 import FilterTask from './components/FilterTask';
 import './App.css';
 
 function App() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(()=>{
+    const stored = localStorage.getItem('tasks');
+    return stored? JSON.parse(stored):[];
+  });
   const [filter, setFilter] = useState('All');
 
-  const addTask = (title) => {
+  useEffect(()=>{
+    localStorage.setItem('tasks',JSON.stringify(tasks));
+  },[tasks]);
+
+  function addTask(title) {
     if (title.trim() === '') return;
     const newTask = {
       id: Date.now(),
@@ -16,7 +23,7 @@ function App() {
       completed: false,
     };
     setTasks([...tasks, newTask]);
-  };
+  }
 
   const toggleTask = (id) => {
     setTasks(
